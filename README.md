@@ -1,2 +1,2 @@
 # purple
-every thing feels purple
+Everything feels purple
