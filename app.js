@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -28,13 +30,20 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser('12345-67890-09876-54321'));
+//app.use(cookieParser('12345-67890-09876-54321'));
 
+app.use(session({
+  name : 'session-id',
+  account : 'money',
+  secret : '12345-67890-09876-54321',
+  saveUninitialized : false,
+  store: new FileStore()
+}));
 
 function auth(req, res, next){
-    console.log(req.signedCookies);
+    console.log(req.session);
 
-    if(!req.signedCookies.name){
+    if(!req.session.name){
 
       var authHeader = req.headers.authorization;
 
@@ -49,7 +58,8 @@ function auth(req, res, next){
       var password = auth[1];
       if(username == 'admin' && password == 'password'){
         //ye karayee baraye set kardan cookie anjam bedim
-        res.cookie('name' , 'admin' , {signed : true});
+        req.session.name = 'admin';
+        req.session.money = 'very';
         next();
       }
       else{
@@ -60,7 +70,7 @@ function auth(req, res, next){
       }
     }
     else{//for cookie
-      if(req.signedCookies.name == 'admin'){
+      if(req.session.name == 'admin'){
         next();
       }
       else{
