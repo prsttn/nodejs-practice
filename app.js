@@ -34,48 +34,30 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(session({
   name : 'session-id',
-  account : 'money',
   secret : '12345-67890-09876-54321',
   saveUninitialized : false,
   store: new FileStore()
 }));
 
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
 function auth(req, res, next){
     console.log(req.session);
 
-    if(!req.session.name){
-
-      var authHeader = req.headers.authorization;
-
-      if(!authHeader){
-        var err = new Error('You are not authenticated');
-        err.status = 401;
-        res.setHeader('WWW-Authenticate' , 'Basic');
-        return next(err);
+    if(!req.session.user){      
+      var err = new Error('You are not authenticated');
+      err.status = 401;
+      res.setHeader('WWW-Authenticate' , 'Basic');
+      return next(err);
       }
-      var auth = new Buffer.from(authHeader.split(' ')[1] , "base64").toString().split(':');
-      var username = auth[0];
-      var password = auth[1];
-      if(username == 'admin' && password == 'password'){
-        //ye karayee baraye set kardan cookie anjam bedim
-        req.session.name = 'admin';
-        req.session.money = 'very';
-        next();
-      }
-      else{
-        var err = new Error('You are not authenticated');
-        err.status = 401;
-        res.setHeader('WWW-Authenticate' , 'Basic');
-        return next(err);
-      }
-    }
     else{//for cookie
-      if(req.session.name == 'admin'){
+      if(req.session.user == 'authenticated'){
         next();
       }
       else{
         var err = new Error('You are not authenticated');
-        err.status = 401;
+        err.status = 403;
         return next(err);
       }
     
