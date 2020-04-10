@@ -32,7 +32,7 @@ app.all('*' , (req, res, next) => {
     return next();
   }
   else{
-    res.redirect(307,`https://${req.hostname}:${app.get('secPort')}/${req.url}`);
+    res.redirect(307,`https://${req.hostname}:${app.get('secPort')}${req.url}`);
   }
 })
 // view engine setup
