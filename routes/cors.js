@@ -21,3 +21,6 @@ var corsOptionsDelegate  =(req , callback) => {
 
 exports.cors = cors();
 exports.corsWithOptions = cors(corsOptionsDelegate);
+
+// app id : 1029790857467478
+//app secret: 9f6b376b8816f0b01541ecd3d969403b

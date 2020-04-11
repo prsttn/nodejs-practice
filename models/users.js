@@ -11,6 +11,7 @@ const User = new Schema({
         type : String , 
         defualt : ''
     },
+    facebookId : String ,
     admin: {
         type: Boolean,
         default: false
