@@ -41,13 +41,9 @@ favoritRouter.route('/')
 })
 .post(authenticate.verifyUser,checkUser, (req, res, next) => {
         favorits = res.locals.favorits;
-        console.log(req.body.length);
         for( i = 0 ; i < req.body.length ; i++){
-            console.log("i="+i);
-            console.log(favorits.dishes.indexOf(req.body[i]._id));
             if(favorits.dishes.indexOf(req.body[i]._id) === -1){
                     favorits.dishes.push(req.body[i]._id);
-                    console.log(favorits.dishes);
             }
         }
         favorits.save().then((favorits)=> {
@@ -88,9 +84,7 @@ favoritRouter.route('/:dishId')
 })
 .delete(authenticate.verifyUser, checkUser, (req, res, next) => {
     favorits = res.locals.favorits;
-    console.log(favorits.dishes[0]);
     var index = favorits.dishes.indexOf(req.params.dishId);
-    console.log(favorits.dishes[index]);
     favorits.dishes.splice(index,1);
     favorits.save()
     .then((favorits) => {
