@@ -64,6 +64,29 @@ favoritRouter.route('/')
 })
 
 favoritRouter.route('/:dishId')
+.get(authenticate.verifyUser , (req, res, next ) =>{
+    Favorits.findOne({user : req.user._id})
+    .then((favorits) => {
+        if(!favorits){
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json({'exists' : false , favorits: favorits});
+        }
+        else {
+            if(favorits.dishes.indexOf(req.params.dishId) < 0){
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({'exists' : false , favorits: favorits});
+            }
+            else{
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({'exists' : true , favorits: favorits});
+            }
+        }
+    }, (err) => next(err))
+    .catch((err) => next(err));
+})
 .post(authenticate.verifyUser, checkUser, (req, res, next) => {
     favorits = res.locals.favorits;
         if(favorits.dishes.indexOf(req.params.dishId) !== -1){
