@@ -25,7 +25,7 @@ const leaderSchema = new Schema({
         required : true
     },
     featured :{
-        type : String,
+        type : Boolean,
         defualt : false
     }
 },{ 

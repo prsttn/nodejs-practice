@@ -3,6 +3,7 @@ const authenticate = require('../authenticate');
 const mongoose = require('mongoose');
 const Favorits = require('../models/favorits');
 const bodyParser = require('body-parser');
+const cors = require('./cors');
 
 const checkUser = (req, res, next) => {
     Favorits.findOne({user : req.user._id})
@@ -13,7 +14,7 @@ const checkUser = (req, res, next) => {
         }
         else if (favorits === null &&  (req.method === 'GET' || req.method ==='DELETE')){
             var err = new Error('You don\'t have the favorits list');
-            err.statusCode = 404;
+            err.status = 404;
             return next(err);
         }
         else if(favorits === null && req.method === 'POST'){
@@ -26,12 +27,13 @@ const checkUser = (req, res, next) => {
     .catch((err) => next(err));
 };
 
+console.log('enter to favorit router');
 const favoritRouter = express.Router();
 
 favoritRouter.use(bodyParser.json());
-
+favoritRouter.options('*',cors.corsWithOptions , (req,res) => { res.statusCode = 200})
 favoritRouter.route('/')
-.get(authenticate.verifyUser, checkUser, (req, res, next) => {
+.get(cors.corsWithOptions,authenticate.verifyUser, checkUser, (req, res, next) => {
     Favorits.findOne({user : req.user._id}).populate('user').populate('dishes')
     .then((favorits) => {
         res.statusCode = 200;
@@ -39,7 +41,7 @@ favoritRouter.route('/')
         res.json(favorits);
     })
 })
-.post(authenticate.verifyUser,checkUser, (req, res, next) => {
+.post(cors.corsWithOptions,authenticate.verifyUser,checkUser, (req, res, next) => {
         favorits = res.locals.favorits;
         for( i = 0 ; i < req.body.length ; i++){
             if(favorits.dishes.indexOf(req.body[i]._id) === -1){
@@ -53,7 +55,7 @@ favoritRouter.route('/')
         }, (err) => next(err))
         .catch((err) => next(err));
 })
-.delete(authenticate.verifyUser, checkUser , (req, res, next) => {
+.delete(cors.corsWithOptions,authenticate.verifyUser, checkUser , (req, res, next) => {
         favorits = res.locals.favorits;
         favorits.remove().then((favorits) => {
             res.statusCode = 200;
@@ -64,7 +66,7 @@ favoritRouter.route('/')
 })
 
 favoritRouter.route('/:dishId')
-.get(authenticate.verifyUser , (req, res, next ) =>{
+.get(cors.corsWithOptions,authenticate.verifyUser , (req, res, next ) =>{
     Favorits.findOne({user : req.user._id})
     .then((favorits) => {
         if(!favorits){
@@ -87,7 +89,7 @@ favoritRouter.route('/:dishId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(authenticate.verifyUser, checkUser, (req, res, next) => {
+.post(cors.corsWithOptions,authenticate.verifyUser, checkUser, (req, res, next) => {
     favorits = res.locals.favorits;
         if(favorits.dishes.indexOf(req.params.dishId) !== -1){
                 var err = new Error('This dish already exits in your favorits list!')
@@ -105,7 +107,7 @@ favoritRouter.route('/:dishId')
         }
 
 })
-.delete(authenticate.verifyUser, checkUser, (req, res, next) => {
+.delete(cors.corsWithOptions,authenticate.verifyUser, checkUser, (req, res, next) => {
     favorits = res.locals.favorits;
     var index = favorits.dishes.indexOf(req.params.dishId);
     favorits.dishes.splice(index,1);

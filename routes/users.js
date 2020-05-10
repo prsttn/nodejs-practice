@@ -9,7 +9,7 @@ var router = express.Router();
 
 /* GET users listing. */
 router.use(bodyParser.json());
-
+router.options('*',cors.corsWithOptions , (req,res) => { res.statusCode = 200; console.log('entercors');})
 router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   User.find({}).then((users) =>{
     res.statusCode = 200;
@@ -67,6 +67,8 @@ router.post('/login' , cors.corsWithOptions, (req, res, next) => {
       var token = authenticate.getToken({_id : req.user._id});
       res.statusCode = 200;
       res.setHeader('Content-Type' , 'application/json');
+      
+      //res.header('Access-Control-Allow-Origin' ,'http://localhost:4200')
       res.json({success: true , token : token ,status : 'Login Successful!'});
     });
   })(req, res, next)
@@ -85,7 +87,7 @@ router.get('/logout' , cors.corsWithOptions, (req , res, next) =>{
   }
 });
 
-router.get('/checkJWTtoken' , (req, res, next) => {
+router.get('/checkJWTtoken' ,cors.corsWithOptions, (req, res, next) => {
     passport.authenticate('jwt' , {session : false}, (err, user, info) =>{
         if(err){
           return next(err);
@@ -98,7 +100,7 @@ router.get('/checkJWTtoken' , (req, res, next) => {
         else{
           res.statusCode = 200;
           res.setHeader('Content-Type' , 'application/json');
-          res.jsin({success : true , status : 'JWT valid!', user : user});
+          res.json({success : true , status : 'JWT valid!', user : user});
         }
     }) (req, res, next);
 });
