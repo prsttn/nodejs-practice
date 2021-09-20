@@ -10,6 +10,7 @@ const leaderRouter = express.Router();
 
 leaderRouter.route('/')
 .options(cors.corsWithOptions , (req, res) => {
+    console.log('zero to hero');
     res.statusCode = 200;
 })
 .get(cors.cors, (req, res, next) => {
