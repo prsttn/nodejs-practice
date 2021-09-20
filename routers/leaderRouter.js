@@ -5,6 +5,7 @@ const leaderRouter = express.Router();
 
 leaderRouter.route('/')
 .all((req, res, next) => {
+    console.log('zero to hero')
     res.statusCode = 200;
     res.setHeader('Content-Type' , 'text/plain');
     next();
